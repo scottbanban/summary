@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ title|default('个人博客网站（飞书多维表格驱动）') }}{% endblock %}</title>
+
+    <!-- Apple Design Style + 中国红主题 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Font Awesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 自定义字体：苹方字体 + 思源宋体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <a href="{{ url_for('index') }}" class="logo-link">
+                        <i class="fas fa-apple-alt logo-icon"></i>
+                        <span class="logo-text">飞书博客</span>
+                    </a>
+                </div>
+
+                <div class="nav-links">
+                    <a href="{{ url_for('index') }}" class="nav-link">
+                        <i class="fas fa-home"></i> 首页
+                    </a>
+                    <a href="https://open.feishu.cn" target="_blank" class="nav-link">
+                        <i class="fas fa-external-link-alt"></i> 飞书
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p class="copyright">
+                        <i class="fas fa-copyright"></i> {{ year|default('2025') }} 飞书多维表格驱动博客
+                    </p>
+                    <p class="tech-info">
+                        基于Flask 3.0.0 + 飞书API
+                    </p>
+                </div>
+
+                <div class="footer-links">
+                    <a href="{{ url_for('health_check') }}" class="footer-link">
+                        <i class="fas fa-heartbeat"></i> 健康状态
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

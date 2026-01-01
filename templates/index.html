@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <i class="fas fa-book-open"></i> 我的学习博客
+        </h1>
+        <p class="hero-subtitle">
+            通过飞书多维表格驱动的知识分享平台<br>
+            记录思考、总结与成长
+        </p>
+        <div class="hero-stats">
+            <div class="stat-item">
+                <i class="fas fa-newspaper"></i>
+                <span class="stat-number">{{ records|length or 0 }}</span>
+                <span class="stat-label">篇文章</span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-lightbulb"></i>
+                <span class="stat-number">{{ records|selectattr('golden_sentence')|list|length or 0 }}</span>
+                <span class="stat-label">个金句</span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-comments"></i>
+                <span class="stat-number">{{ records|selectattr('comment')|list|length or 0 }}</span>
+                <span class="stat-label">条点评</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="articles-section">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-stream"></i> 最新文章
+        </h2>
+        <p class="section-description">
+            基于飞书多维表格的内容管理系统，实时同步数据
+        </p>
+    </div>
+
+    {% if records %}
+        <div class="articles-list">
+            {% for article in records %}
+                <article class="article-item" id="article-{{ article.id }}">
+                    {% if article.golden_sentence %}
+                        <div class="article-golden">
+                            <i class="fas fa-quote-left"></i>
+                            {{ article.golden_sentence }}
+                            <i class="fas fa-quote-right"></i>
+                        </div>
+                    {% endif %}
+
+                    <h3 class="article-title">
+                        <a href="{{ url_for('article_detail', article_id=article.id) }}" target="_blank">
+                            {{ article.title or "未命名文章" }}
+                        </a>
+                    </h3>
+
+                    <div class="article-meta">
+                        <span class="article-date">
+                            <i class="fas fa-calendar"></i>
+                            创建于 {{ article.created_time|string|truncate(10, true, '') }}
+                        </span>
+                        <span class="article-id">
+                            <i class="fas fa-hashtag"></i>
+                            ID: {{ article.id|truncate(8, true, '') }}
+                        </span>
+                    </div>
+
+                    <div class="article-excerpt">
+                        {{ article.preview or "暂无内容预览" }}
+                    </div>
+
+                    {% if article.comment %}
+                        <div class="article-comment">
+                            <div class="comment-label">
+                                <i class="fas fa-star"></i> 斯高特点评：
+                            </div>
+                            <p class="comment-content">{{ article.comment }}</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="article-actions">
+                        <a href="{{ url_for('article_detail', article_id=article.id) }}"
+                           class="btn btn-primary"
+                           target="_blank">
+                            <i class="fas fa-external-link-alt"></i> 阅读全文
+                        </a>
+                        <div class="action-buttons">
+                            <button class="btn btn-outline share-btn" onclick="shareArticle('{{ article.id }}')">
+                                <i class="fas fa-share-alt"></i> 分享
+                            </button>
+                            <button class="btn btn-outline bookmark-btn" onclick="bookmarkArticle('{{ article.id }}')">
+                                <i class="fas fa-bookmark"></i> 收藏
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+
+        <div class="empty-state" style="display: none;" id="no-articles">
+            <div class="empty-state-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <h3 class="empty-state-title">暂无文章</h3>
+            <p class="empty-state-description">
+                当前没有可显示的文章内容。请检查飞书多维表格中是否有数据。
+            </p>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <h3 class="empty-state-title">暂无文章</h3>
+            <p class="empty-state-description">
+                当前没有可显示的文章内容。请检查：
+            </p>
+            <ul class="empty-state-list">
+                <li>1. 飞书应用是否配置正确</li>
+                <li>2. 多维表格中是否有数据</li>
+                <li>3. 网络连接是否正常</li>
+            </ul>
+        </div>
+    {% endif %}
+</div>
+
+<div class="feature-section">
+    <div class="feature-cards">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-laptop-code"></i>
+            </div>
+            <h4 class="feature-title">苹果设计风格</h4>
+            <p class="feature-description">
+                采用苹果官方设计语言，简洁优雅，提供无干扰的阅读体验。
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-cloud"></i>
+            </div>
+            <h4 class="feature-title">飞书数据驱动</h4>
+            <p class="feature-description">
+                内容完全来自飞书多维表格，支持实时同步，无需数据库管理。
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-palette"></i>
+            </div>
+            <h4 class="feature-title">中国红主题</h4>
+            <p class="feature-description">
+                融入中国传统文化色彩，以中国红为主色调，彰显文化自信。
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+        color: white;
+        padding: var(--space-2xl) 0;
+        margin-bottom: var(--space-2xl);
+        border-radius: var(--radius-xl);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.3;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: var(--text-4xl);
+        margin-bottom: var(--space-md);
+        color: white;
+    }
+
+    .hero-subtitle {
+        font-size: var(--text-lg);
+        opacity: 0.9;
+        margin-bottom: var(--space-xl);
+    }
+
+    .hero-stats {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-xl);
+        margin-top: var(--space-xl);
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-xs);
+    }
+
+    .stat-item i {
+        font-size: var(--text-2xl);
+        opacity: 0.8;
+    }
+
+    .stat-number {
+        font-size: var(--text-3xl);
+        font-weight: 700;
+    }
+
+    .stat-label {
+        font-size: var(--text-sm);
+        opacity: 0.9;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: var(--space-2xl);
+    }
+
+    .section-title {
+        font-size: var(--text-3xl);
+        color: var(--color-primary);
+        margin-bottom: var(--space-sm);
+    }
+
+    .section-description {
+        color: var(--color-text-secondary);
+        font-size: var(--text-lg);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .article-comment {
+        background-color: rgba(200, 37, 6, 0.05);
+        border: 1px solid rgba(200, 37, 6, 0.1);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        margin: var(--space-lg) 0;
+    }
+
+    .comment-label {
+        font-size: var(--text-sm);
+        color: var(--color-primary);
+        font-weight: 600;
+        margin-bottom: var(--space-xs);
+    }
+
+    .comment-label i {
+        margin-right: var(--space-xs);
+    }
+
+    .comment-content {
+        font-size: var(--text-base);
+        color: var(--color-text-secondary);
+        line-height: 1.6;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: var(--space-sm);
+    }
+
+    .feature-section {
+        background-color: var(--color-surface);
+        border-radius: var(--radius-xl);
+        padding: var(--space-2xl) 0;
+        margin-top: var(--space-2xl);
+    }
+
+    .feature-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--space-xl);
+    }
+
+    .feature-card {
+        background-color: var(--color-card);
+        border-radius: var(--radius-lg);
+        padding: var(--space-xl);
+        text-align: center;
+        transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .feature-icon {
+        font-size: var(--text-3xl);
+        color: var(--color-primary);
+        margin-bottom: var(--space-md);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: rgba(200, 37, 6, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto var(--space-md);
+    }
+
+    .feature-title {
+        font-size: var(--text-xl);
+        margin-bottom: var(--space-md);
+    }
+
+    .feature-description {
+        color: var(--color-text-secondary);
+        line-height: 1.6;
+    }
+
+    .empty-state-list {
+        max-width: 400px;
+        margin: var(--space-md) auto 0;
+        text-align: left;
+        color: var(--color-text-secondary);
+    }
+
+    .empty-state-list li {
+        margin-bottom: var(--space-xs);
+    }
+
+    @media (max-width: 768px) {
+        .hero-stats {
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .feature-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .article-actions {
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .action-buttons {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
