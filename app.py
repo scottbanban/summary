@@ -98,6 +98,35 @@ def get_feishu_records():
         app.logger.error(f"请求多维表格API失败: {str(e)}")
         return []
 
+def get_field_value(fields, field_name, default=""):
+    """安全地获取飞书字段值，处理字符串和数组类型"""
+    value = fields.get(field_name, default)
+
+    # 如果是数组类型，取第一个元素
+    if isinstance(value, list):
+        if len(value) > 0:
+            item = value[0]
+            # 如果是文本类型的数组元素，提取text字段
+            if isinstance(item, dict):
+                return item.get("text", str(item))
+            return str(item)
+        return default
+
+    # 如果是字典类型
+    if isinstance(value, dict):
+        # 可能是富文本类型
+        if "text" in value:
+            return value["text"]
+        # 或者其他类型，转为字符串
+        return str(value)
+
+    # 如果是字符串，直接返回
+    if isinstance(value, str):
+        return value
+
+    # 其他类型转为字符串
+    return str(value) if value else default
+
 def process_records(records):
     """处理从飞书获取的原始记录"""
     processed = []
@@ -107,10 +136,10 @@ def process_records(records):
 
         processed_record = {
             "id": record.get("record_id", ""),
-            "title": fields.get("标题", "").strip(),
-            "golden_sentence": fields.get("金句输出", "").strip(),
-            "comment": fields.get("斯高特点评", "").strip(),
-            "content": fields.get("概要内容输出", "").strip(),
+            "title": get_field_value(fields, "标题").strip(),
+            "golden_sentence": get_field_value(fields, "金句输出").strip(),
+            "comment": get_field_value(fields, "斯高特点评").strip(),
+            "content": get_field_value(fields, "概要内容输出").strip(),
             "created_time": record.get("created_time", datetime.now().isoformat()),
         }
 
