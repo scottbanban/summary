@@ -11,3 +11,6 @@ dist/
 build/
 .claude/
 *.docx
+
+# Vercel
+.vercel/
