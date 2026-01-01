@@ -217,4 +217,6 @@ if __name__ == "__main__":
     def before_request():
         clear_expired_cache()
 
-    app.run(host="0.0.0.0", port=8000, debug=app.config["DEBUG"])
+    # Render会通过环境变量PORT指定端口
+    port = int(os.getenv("PORT", 8000))
+    app.run(host="0.0.0.0", port=port, debug=app.config["DEBUG"])
